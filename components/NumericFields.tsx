@@ -1,26 +1,31 @@
 "use client";
 
-import { useState, useEffect, useId } from "react";
+import {
+  useState,
+  useEffect,
+  useId,
+  useRef,
+  useLayoutEffect,
+  type ChangeEvent,
+} from "react";
 
 /**
  * Các input field tự format số.
  *
- * Vấn đề cốt lõi cần giải quyết:
- *  - Người dùng cần nhìn thấy "1.000.000.000" thay vì "1000000000"
- *  - Khi đang gõ, không được tự sắp xếp lại con trỏ làm gián đoạn nhập liệu
- *  - Giá trị truyền lên component cha phải là number sạch (không phải string đã format)
- *  - Tránh bug floating: 0.07 * 100 = 7.000000000000001 → gõ xóa không được
+ * Vấn đề cần giải quyết:
+ *  - Hiển thị "1.000.000.000" thay vì "1000000000"
+ *  - Khi format thêm/bớt dấu phân cách, cursor không được nhảy lung tung
+ *  - Tránh bug floating: 0.07 * 100 = 7.000000000000001
+ *  - Giá trị truyền lên cha luôn là number sạch (không phải string đã format)
  *
- * Cách giải:
- *  - Mỗi field giữ một "draft" string riêng (UI state)
- *  - Khi blur hoặc parent đổi giá trị (preset load), đồng bộ lại draft
- *  - Khi đang focus, không ép format để con trỏ ở yên
- *  - roundClean() làm tròn về step để loại bỏ rác floating point
+ * Cách giải cursor preservation:
+ *  - Trước khi format, đếm số chữ số bên trái cursor trong chuỗi raw.
+ *  - Sau khi DOM update, đặt cursor sau đúng số chữ số đó trong chuỗi mới.
+ *  - Cách này độc lập với số dấu phân cách → không bị lệch khi chuỗi dài.
  */
 
 function roundClean(value: number, step: number): number {
   if (!Number.isFinite(value)) return 0;
-  // Số chữ số thập phân tối đa = số chữ số sau dấu chấm của step
   const decimals = (step.toString().split(".")[1] || "").length;
   return Number(value.toFixed(decimals));
 }
@@ -31,18 +36,38 @@ function formatThousands(n: number): string {
 }
 
 function parseThousands(s: string): number {
-  // Loại mọi ký tự không phải số hoặc dấu trừ
   const cleaned = s.replace(/[^\d-]/g, "");
   if (cleaned === "" || cleaned === "-") return 0;
   return Number(cleaned);
 }
 
 function parseDecimal(s: string): number | null {
-  // Cho phép cả dấu chấm hoặc phẩy làm separator thập phân
   const normalized = s.replace(",", ".").replace(/[^\d.\-]/g, "");
   if (normalized === "" || normalized === "-" || normalized === ".") return null;
   const n = Number(normalized);
   return Number.isFinite(n) ? n : null;
+}
+
+/** Đếm số chữ số trong khoảng [0, end) của chuỗi */
+function countDigits(s: string, end: number): number {
+  let c = 0;
+  for (let i = 0; i < end && i < s.length; i++) {
+    if (s.charCodeAt(i) >= 48 && s.charCodeAt(i) <= 57) c++;
+  }
+  return c;
+}
+
+/** Tìm vị trí trong `formatted` mà có đúng `n` chữ số ở bên trái */
+function cursorAfterDigits(formatted: string, n: number): number {
+  if (n <= 0) return 0;
+  let count = 0;
+  for (let i = 0; i < formatted.length; i++) {
+    if (formatted.charCodeAt(i) >= 48 && formatted.charCodeAt(i) <= 57) {
+      count++;
+      if (count === n) return i + 1;
+    }
+  }
+  return formatted.length;
 }
 
 interface FieldShellProps {
@@ -68,6 +93,29 @@ function FieldShell({ label, hint, suffix, children }: FieldShellProps) {
 const inputClass =
   "w-full rounded bg-surface-2 border border-border px-3 py-2 text-sm font-mono tabular-nums focus:outline-none focus:border-accent";
 
+/**
+ * Hook giữ cursor đúng vị trí khi value của controlled input bị reformat.
+ * Trả về ref + handler để gọi sau mỗi onChange.
+ */
+function useCursorPreserve() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pendingCursor = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (pendingCursor.current !== null && inputRef.current) {
+      const pos = pendingCursor.current;
+      inputRef.current.setSelectionRange(pos, pos);
+      pendingCursor.current = null;
+    }
+  });
+
+  const schedule = (pos: number) => {
+    pendingCursor.current = pos;
+  };
+
+  return { inputRef, schedule };
+}
+
 /* ─── Money (VND, separator hàng nghìn) ───────────────────────────── */
 
 export function MoneyField({
@@ -84,15 +132,29 @@ export function MoneyField({
   const id = useId();
   const [focused, setFocused] = useState(false);
   const [draft, setDraft] = useState(() => formatThousands(value));
+  const { inputRef, schedule } = useCursorPreserve();
 
-  // Đồng bộ khi parent thay đổi và user không đang gõ
   useEffect(() => {
     if (!focused) setDraft(formatThousands(value));
   }, [value, focused]);
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const cursor = e.target.selectionStart ?? raw.length;
+    const digitsLeft = countDigits(raw, cursor);
+
+    const n = parseThousands(raw);
+    const formatted = raw === "" ? "" : formatThousands(n);
+
+    schedule(cursorAfterDigits(formatted, digitsLeft));
+    setDraft(formatted);
+    onChange(n);
+  };
+
   return (
     <FieldShell label={label} hint={hint} suffix="VNĐ">
       <input
+        ref={inputRef}
         id={id}
         type="text"
         inputMode="numeric"
@@ -104,13 +166,7 @@ export function MoneyField({
           setDraft(formatThousands(n));
           onChange(n);
         }}
-        onChange={(e) => {
-          const raw = e.target.value;
-          // Cho phép user gõ tự do, nhưng tự re-format ngay sau mỗi keypress
-          const n = parseThousands(raw);
-          setDraft(raw === "" ? "" : formatThousands(n));
-          onChange(n);
-        }}
+        onChange={handleChange}
         className={inputClass}
       />
     </FieldShell>
@@ -137,11 +193,7 @@ export function PercentField({
   const id = useId();
   const [focused, setFocused] = useState(false);
 
-  // Quy chuẩn: ép giá trị decimal → % và làm tròn về step
-  const toDisplay = (v: number) => {
-    const pct = v * 100;
-    return roundClean(pct, step);
-  };
+  const toDisplay = (v: number) => roundClean(v * 100, step);
 
   const [draft, setDraft] = useState(() => String(toDisplay(value)));
 
@@ -172,7 +224,6 @@ export function PercentField({
         onChange={(e) => {
           const raw = e.target.value;
           setDraft(raw);
-          // Update parent ngay nếu parse được, để chart phản hồi real-time
           const parsed = parseDecimal(raw);
           if (parsed !== null) {
             onChange(roundClean(parsed, step) / 100);
