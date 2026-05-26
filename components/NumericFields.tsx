@@ -3,13 +3,13 @@
 import { useState, useEffect, useId, useRef } from "react";
 
 /**
- * Các input field cho engine.
+ * Input fields cho engine — Neobrutalism style.
  *
- * - MoneyField: input số thuần, không format. Đơn giản, không bug.
- * - PercentField: lưu decimal 0..1, hiển thị %. Tránh bug 0.07*100 = 7.000...001.
- * - IntField: số nguyên có clamp.
+ * MoneyField: input số thuần, không format (đã thử format thì gặp bug nhập liệu).
+ * PercentField: lưu decimal 0..1, hiển thị %. Tránh bug 0.07*100 = 7.000...001.
+ * IntField: số nguyên có clamp.
  *
- * Cả 3 đều có lastEmittedRef để phân biệt:
+ * Cả 3 dùng pattern lastEmittedRef để phân biệt:
  *  - Value đến từ chính ta (echo) → bỏ qua, không sync draft.
  *  - Value đến từ ngoài (preset, reset, hydration) → sync draft.
  */
@@ -36,19 +36,22 @@ interface FieldShellProps {
 
 function FieldShell({ label, hint, suffix, children }: FieldShellProps) {
   return (
-    <label className="flex flex-col gap-1">
-      <span className="text-xs text-text-dim">{label}</span>
+    <label className="flex flex-col gap-1.5">
+      <span className="text-[11px] font-bold uppercase tracking-wider text-text">
+        {label}
+      </span>
       <div className="flex items-center gap-2">
         <div className="flex-1">{children}</div>
-        {suffix && <span className="text-xs text-text-dim">{suffix}</span>}
+        {suffix && (
+          <span className="text-xs font-bold text-text-dim min-w-[36px]">
+            {suffix}
+          </span>
+        )}
       </div>
-      {hint && <span className="text-[11px] text-text-dim/70">{hint}</span>}
+      {hint && <span className="text-[11px] text-text-dim">{hint}</span>}
     </label>
   );
 }
-
-const inputClass =
-  "w-full rounded bg-surface-2 border border-border px-3 py-2 text-sm font-mono tabular-nums focus:outline-none focus:border-accent";
 
 /* ─── Money (VND, không format) ───────────────────────────────────── */
 
@@ -87,8 +90,6 @@ export function MoneyField({
           const raw = e.target.value;
           setDraft(raw);
           if (raw === "") {
-            // Để input thực sự rỗng, không ép về 0 và đẩy lên cha
-            // (sẽ làm input hiển thị lại "0" và không xóa được).
             if (lastEmittedRef.current !== 0) {
               lastEmittedRef.current = 0;
               onChange(0);
@@ -102,10 +103,9 @@ export function MoneyField({
           }
         }}
         onBlur={() => {
-          // Khi rời input mà vẫn rỗng, hiển thị "0" cho gọn
           if (draft === "") setDraft("0");
         }}
-        className={inputClass}
+        className="brut-input"
       />
     </FieldShell>
   );
@@ -121,10 +121,8 @@ export function PercentField({
   hint,
 }: {
   label: string;
-  /** Decimal 0..1 - vd. 0.07 nghĩa là 7% */
   value: number;
   onChange: (v: number) => void;
-  /** Step tính theo % (1 = 1%, 0.1 = 0.1%) */
   step?: number;
   hint?: string;
 }) {
@@ -181,13 +179,13 @@ export function PercentField({
             onChange(next);
           }
         }}
-        className={inputClass}
+        className="brut-input"
       />
     </FieldShell>
   );
 }
 
-/* ─── Số nguyên (vd. số năm) ──────────────────────────────────────── */
+/* ─── Số nguyên ───────────────────────────────────────────────────── */
 
 export function IntField({
   label,
@@ -228,7 +226,7 @@ export function IntField({
         onChange={(e) => {
           const raw = e.target.value;
           setDraft(raw);
-          if (raw === "") return; // cho phép tạm thời rỗng khi đang gõ
+          if (raw === "") return;
           const n = Number(raw);
           if (!Number.isFinite(n)) return;
           const clamped = Math.max(min, Math.min(max, Math.round(n)));
@@ -249,7 +247,7 @@ export function IntField({
             onChange(clamped);
           }
         }}
-        className={inputClass}
+        className="brut-input"
       />
     </FieldShell>
   );

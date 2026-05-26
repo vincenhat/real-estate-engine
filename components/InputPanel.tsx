@@ -11,6 +11,14 @@ interface Props {
   onLoadPreset: (key: PresetKey) => void;
 }
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-black uppercase tracking-widest mb-3 pb-2 border-b-2 border-border">
+      {children}
+    </h3>
+  );
+}
+
 export function InputPanel({ input, onChange, onLoadPreset }: Props) {
   const update = <K extends keyof ScenarioInput>(
     key: K,
@@ -21,15 +29,13 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
     <div className="space-y-6">
       {/* Presets */}
       <div>
-        <div className="text-xs uppercase tracking-wide text-text-dim mb-2">
-          Kịch bản mẫu
-        </div>
+        <SectionTitle>Kịch bản mẫu</SectionTitle>
         <div className="flex flex-col gap-2">
           {(Object.keys(PRESETS) as PresetKey[]).map((key) => (
             <button
               key={key}
               onClick={() => onLoadPreset(key)}
-              className="text-left text-sm px-3 py-2 rounded bg-surface-2 border border-border hover:border-accent transition-colors"
+              className="brut-btn text-left text-xs leading-tight !py-2 !px-3"
             >
               {PRESETS[key].label}
             </button>
@@ -37,17 +43,18 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
         </div>
       </div>
 
-      {/* Tài sản */}
       <section>
-        <h3 className="text-sm font-semibold mb-3 text-accent">Tài sản</h3>
+        <SectionTitle>Tài sản</SectionTitle>
         <div className="space-y-3">
           <MoneyField
             label="Giá mua"
             value={input.property.price}
             onChange={(v) => update("property", { ...input.property, price: v })}
           />
-          <label className="flex flex-col gap-1">
-            <span className="text-xs text-text-dim">Phân khúc</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider">
+              Phân khúc
+            </span>
             <select
               value={input.property.segment}
               onChange={(e) =>
@@ -56,7 +63,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
                   segment: e.target.value as Segment,
                 })
               }
-              className="w-full rounded bg-surface-2 border border-border px-3 py-2 text-sm focus:outline-none focus:border-accent"
+              className="brut-input"
             >
               {(Object.keys(SEGMENT_BENCHMARKS) as Segment[]).map((seg) => (
                 <option key={seg} value={seg}>
@@ -68,9 +75,8 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
         </div>
       </section>
 
-      {/* Khoản vay */}
       <section>
-        <h3 className="text-sm font-semibold mb-3 text-accent">Khoản vay</h3>
+        <SectionTitle>Khoản vay</SectionTitle>
         <div className="space-y-3">
           <PercentField
             label="Tỷ lệ vốn tự có"
@@ -95,14 +101,15 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
         </div>
       </section>
 
-      {/* Cho thuê */}
       <section>
-        <h3 className="text-sm font-semibold mb-3 text-accent">Cho thuê</h3>
+        <SectionTitle>Cho thuê</SectionTitle>
         <div className="space-y-3">
           <MoneyField
             label="Tiền thuê hàng tháng"
             value={input.rental.monthlyRent}
-            onChange={(v) => update("rental", { ...input.rental, monthlyRent: v })}
+            onChange={(v) =>
+              update("rental", { ...input.rental, monthlyRent: v })
+            }
           />
           <PercentField
             label="Chi phí vận hành"
@@ -125,11 +132,8 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
         </div>
       </section>
 
-      {/* Thị trường */}
       <section>
-        <h3 className="text-sm font-semibold mb-3 text-accent">
-          Giả định thị trường
-        </h3>
+        <SectionTitle>Giả định thị trường</SectionTitle>
         <div className="space-y-3">
           <PercentField
             label="Tốc độ tăng giá tài sản"
