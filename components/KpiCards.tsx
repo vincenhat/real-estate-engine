@@ -45,22 +45,33 @@ export function KpiCards({ result }: { result: ScenarioResult }) {
       {cards.map((c) => (
         <div
           key={c.label}
-          className={`${c.featured ? "v-card-featured" : "v-card"} p-5`}
+          className="a-card p-5"
+          style={
+            c.featured
+              ? {
+                  background:
+                    "linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--card)) 0%, var(--card) 100%)",
+                  borderColor:
+                    "color-mix(in srgb, var(--accent) 30%, var(--divider))",
+                }
+              : undefined
+          }
         >
-          <div className="t-mono-label text-text-muted">{c.label}</div>
+          <div className="t-eyebrow text-text-muted">{c.label}</div>
           <div
-            className="mt-2 font-semibold"
+            className="mt-3"
             style={{
               fontSize: 32,
+              fontWeight: 600,
               lineHeight: 1.1,
-              letterSpacing: "-1.28px",
-              color: "var(--text)",
+              letterSpacing: "-0.5px",
+              color: c.featured ? "var(--accent)" : "var(--text)",
               fontVariantNumeric: "tabular-nums",
             }}
           >
             {c.value}
           </div>
-          <div className="t-caption text-text-dim mt-2">{c.sub}</div>
+          <div className="t-meta text-text-dim mt-2">{c.sub}</div>
         </div>
       ))}
     </div>

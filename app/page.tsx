@@ -9,6 +9,7 @@ import { ProjectionChart, CashFlowChart } from "@/components/ProjectionChart";
 import { YearlyTable } from "@/components/YearlyTable";
 import { RiskPanel } from "@/components/RiskPanel";
 import { SensitivityChart } from "@/components/SensitivityChart";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   usePersistedScenario,
   clearPersistedScenario,
@@ -26,30 +27,48 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-card shadow-border px-6 lg:px-10 py-4 flex items-center justify-between gap-4 flex-wrap">
+    <main className="min-h-screen bg-bg">
+      <header
+        className="sticky top-0 z-10 px-6 lg:px-10 py-3.5 flex items-center justify-between gap-4 flex-wrap"
+        style={{
+          background: "color-mix(in srgb, var(--bg) 80%, transparent)",
+          backdropFilter: "saturate(180%) blur(20px)",
+          WebkitBackdropFilter: "saturate(180%) blur(20px)",
+          borderBottom: "1px solid var(--divider)",
+        }}
+      >
         <div className="flex items-center gap-3">
-          <span className="t-mono-label text-text-muted">v0.1</span>
-          <h1 className="t-card-title">Real Estate Engine</h1>
+          <span className="t-eyebrow text-text-dim">Real Estate Engine</span>
+          <span className="t-meta text-text-muted">v0.1</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="v-pill">VN · 2024–2025</span>
-          <button onClick={reset} className="v-btn" title="Xóa dữ liệu đã lưu">
+          <ThemeToggle />
+          <button
+            onClick={reset}
+            className="a-btn t-control"
+            title="Xóa dữ liệu đã lưu"
+          >
             Reset
           </button>
         </div>
       </header>
 
-      <div className="px-6 lg:px-10 pt-8 pb-4">
-        <p className="t-small text-text-dim max-w-2xl">
-          Mô phỏng đòn bẩy, dòng tiền và rủi ro cho đầu tư bất động sản tại
-          Việt Nam. Logic tính toán dựa trên báo cáo phân tích cơ chế lợi nhuận
-          BĐS VN, benchmark CBRE / Savills / Batdongsan / VARS / BIDV.
+      {/* Hero */}
+      <section className="px-6 lg:px-10 pt-12 lg:pt-20 pb-10 lg:pb-14 max-w-5xl">
+        <h1 className="t-hero text-text">
+          Mô phỏng đầu tư bất động sản.
+          <br />
+          <span className="text-text-dim">Đòn bẩy, dòng tiền, rủi ro.</span>
+        </h1>
+        <p className="t-body text-text-dim mt-5 max-w-2xl">
+          Engine tính toán dựa trên báo cáo phân tích cơ chế lợi nhuận BĐS Việt
+          Nam. Benchmark CBRE, Savills, Batdongsan, VARS, BIDV — cập nhật bối
+          cảnh 2024–2025.
         </p>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 px-6 lg:px-10 pb-10">
-        <aside className="v-card p-5 self-start lg:sticky lg:top-[88px]">
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 px-6 lg:px-10 pb-16">
+        <aside className="a-card p-6 self-start lg:sticky lg:top-[80px]">
           <InputPanel
             input={input}
             onChange={setInput}
@@ -74,9 +93,12 @@ export default function Home() {
         </section>
       </div>
 
-      <footer className="shadow-border px-6 lg:px-10 py-6 t-caption text-text-muted">
-        Benchmark dữ liệu: CBRE, Savills, Batdongsan.com.vn, VARS, BIDV (2024–2025).
-        Aesthetic inspiration only — not affiliated with Vercel.
+      <footer
+        className="px-6 lg:px-10 py-8 t-meta text-text-muted"
+        style={{ borderTop: "1px solid var(--divider)" }}
+      >
+        Benchmark dữ liệu: CBRE, Savills, Batdongsan.com.vn, VARS, BIDV
+        (2024–2025). Aesthetic inspiration only — not affiliated with Apple Inc.
       </footer>
     </main>
   );

@@ -3,24 +3,24 @@
 import type { ScenarioResult, RiskLevel } from "@/engine";
 import { formatPercent, formatVND, PI_RATIO_GLOBAL, PI_RATIO_VN } from "@/engine";
 
-const PILL_TONE: Record<RiskLevel, { bg: string; text: string }> = {
-  safe: { bg: "#ecfdf5", text: "#16a34a" },
-  warning: { bg: "#fffbeb", text: "#d97706" },
-  danger: { bg: "#fef2f2", text: "#dc2626" },
+const PILL_VAR: Record<RiskLevel, string> = {
+  safe: "var(--success)",
+  warning: "var(--warning)",
+  danger: "var(--danger)",
 };
 
 const LABEL: Record<RiskLevel, string> = {
-  safe: "Safe",
-  warning: "Warn",
-  danger: "Danger",
+  safe: "An toàn",
+  warning: "Cảnh báo",
+  danger: "Nguy hiểm",
 };
 
 export function RiskPanel({ result }: { result: ScenarioResult }) {
   const { risk } = result;
 
   return (
-    <div className="v-card p-5 space-y-6">
-      <h3 className="t-mono-label text-text-muted">3 điều kiện tiên quyết</h3>
+    <div className="a-card p-5 space-y-6">
+      <h3 className="t-eyebrow text-text-muted">3 điều kiện tiên quyết</h3>
 
       <Row
         title="Tỷ lệ khỏa lấp nợ (DCR)"
@@ -37,31 +37,34 @@ export function RiskPanel({ result }: { result: ScenarioResult }) {
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="t-body-semibold">P/I (Giá / Thu nhập năm)</span>
-          <span className="font-mono font-semibold text-text" style={{ fontVariantNumeric: "tabular-nums" }}>
+          <span className="t-control-strong text-text">P/I (Giá / Thu nhập năm)</span>
+          <span
+            className="font-mono font-semibold text-text"
+            style={{ fontVariantNumeric: "tabular-nums" }}
+          >
             {risk.priceToIncomeRatio.toFixed(1)}x
           </span>
         </div>
-        <div className="t-caption text-text-muted">
+        <div className="t-meta text-text-dim">
           VN trung bình {PI_RATIO_VN}, toàn cầu {PI_RATIO_GLOBAL}.
         </div>
       </div>
 
       <div>
-        <div className="t-mono-label text-text-muted mb-3">
-          Stress test trống nhà
-        </div>
-        <div className="rounded-md shadow-ring overflow-hidden">
+        <div className="t-eyebrow text-text-muted mb-3">Stress test trống nhà</div>
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ border: "1px solid var(--divider)" }}
+        >
           {risk.vacancyStress.map((s, i) => (
             <div
               key={s.vacantMonths}
               className="flex justify-between items-center px-4 py-2.5"
               style={{
-                boxShadow:
-                  i > 0 ? "rgb(235, 235, 235) 0px 1px 0px 0px inset" : undefined,
+                borderTop: i > 0 ? "1px solid var(--divider)" : undefined,
               }}
             >
-              <span className="t-small text-text-dim">
+              <span className="t-control text-text-dim">
                 Trống thêm {s.vacantMonths} tháng
               </span>
               <span
@@ -77,15 +80,17 @@ export function RiskPanel({ result }: { result: ScenarioResult }) {
 
       {risk.warnings.length > 0 && (
         <div>
-          <div className="t-mono-label text-text-muted mb-3">Cảnh báo</div>
+          <div className="t-eyebrow text-text-muted mb-3">Cảnh báo</div>
           <ul className="space-y-2">
             {risk.warnings.map((w, i) => (
               <li
                 key={i}
-                className="rounded-md px-3 py-2.5 t-small text-text"
+                className="rounded-xl px-4 py-3 t-control text-text"
                 style={{
-                  background: "#fffbeb",
-                  boxShadow: "#fde68a 0px 0px 0px 1px",
+                  background:
+                    "color-mix(in srgb, var(--warning) 12%, var(--surface))",
+                  border:
+                    "1px solid color-mix(in srgb, var(--warning) 30%, var(--divider))",
                 }}
               >
                 {w}
@@ -109,11 +114,10 @@ function Row({
   level: RiskLevel;
   hint: string;
 }) {
-  const tone = PILL_TONE[level];
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-1">
-        <span className="t-body-semibold">{title}</span>
+        <span className="t-control-strong text-text">{title}</span>
         <div className="flex items-center gap-2">
           <span
             className="font-mono font-semibold text-text"
@@ -122,21 +126,20 @@ function Row({
             {valueLabel}
           </span>
           <span
-            className="font-mono"
             style={{
               fontSize: 11,
-              fontWeight: 500,
-              padding: "2px 8px",
+              fontWeight: 600,
+              padding: "3px 10px",
               borderRadius: 9999,
-              background: tone.bg,
-              color: tone.text,
+              background: `color-mix(in srgb, ${PILL_VAR[level]} 14%, transparent)`,
+              color: PILL_VAR[level],
             }}
           >
             {LABEL[level]}
           </span>
         </div>
       </div>
-      <div className="t-caption text-text-muted">{hint}</div>
+      <div className="t-meta text-text-dim">{hint}</div>
     </div>
   );
 }

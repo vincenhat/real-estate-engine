@@ -12,7 +12,7 @@ interface Props {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="t-mono-label text-text-muted mb-3">{children}</h3>;
+  return <h3 className="t-eyebrow text-text-dim mb-4">{children}</h3>;
 }
 
 export function InputPanel({ input, onChange, onLoadPreset }: Props) {
@@ -31,7 +31,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
             <button
               key={key}
               onClick={() => onLoadPreset(key)}
-              className="v-btn !justify-start !text-left t-small leading-tight"
+              className="a-btn !justify-start !text-left !rounded-xl t-control leading-tight !py-2.5"
             >
               {PRESETS[key].label}
             </button>
@@ -48,7 +48,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
             onChange={(v) => update("property", { ...input.property, price: v })}
           />
           <label className="flex flex-col gap-1.5">
-            <span className="t-mono-label text-text-dim">Phân khúc</span>
+            <span className="t-control-strong text-text">Phân khúc</span>
             <select
               value={input.property.segment}
               onChange={(e) =>
@@ -57,7 +57,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
                   segment: e.target.value as Segment,
                 })
               }
-              className="v-input"
+              className="a-input"
             >
               {(Object.keys(SEGMENT_BENCHMARKS) as Segment[]).map((seg) => (
                 <option key={seg} value={seg}>

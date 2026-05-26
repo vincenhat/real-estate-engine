@@ -3,13 +3,8 @@
 import { useState, useEffect, useId, useRef } from "react";
 
 /**
- * Input fields cho engine — Vercel minimalism style.
- *
- * Cùng pattern như trước:
- *  - MoneyField: input số thuần, tách draft/value
- *  - PercentField: lưu decimal 0..1, hiển thị %
- *  - IntField: số nguyên có clamp
- *  - lastEmittedRef phân biệt echo vs external update
+ * Input fields — Apple commerce style: border-led containment, rounded 10px,
+ * accent ring khi focus.
  */
 
 function roundClean(value: number, step: number): number {
@@ -35,21 +30,21 @@ interface FieldShellProps {
 function FieldShell({ label, hint, suffix, children }: FieldShellProps) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="t-mono-label text-text-dim">{label}</span>
+      <span className="t-control-strong text-text">{label}</span>
       <div className="flex items-center gap-2">
         <div className="flex-1">{children}</div>
         {suffix && (
-          <span className="t-mono-label text-text-muted min-w-[36px]">
+          <span className="t-meta text-text-muted min-w-[36px] font-medium">
             {suffix}
           </span>
         )}
       </div>
-      {hint && <span className="t-caption text-text-muted">{hint}</span>}
+      {hint && <span className="t-meta text-text-dim">{hint}</span>}
     </label>
   );
 }
 
-/* ─── Money (VND, không format) ───────────────────────────────────── */
+/* ─── Money ───────────────────────────────────────────────────────── */
 
 export function MoneyField({
   label,
@@ -101,7 +96,7 @@ export function MoneyField({
         onBlur={() => {
           if (draft === "") setDraft("0");
         }}
-        className="v-input"
+        className="a-input"
       />
     </FieldShell>
   );
@@ -175,7 +170,7 @@ export function PercentField({
             onChange(next);
           }
         }}
-        className="v-input"
+        className="a-input"
       />
     </FieldShell>
   );
@@ -243,7 +238,7 @@ export function IntField({
             onChange(clamped);
           }
         }}
-        className="v-input"
+        className="a-input"
       />
     </FieldShell>
   );
