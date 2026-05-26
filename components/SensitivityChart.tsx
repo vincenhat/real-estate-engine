@@ -18,10 +18,10 @@ import { sweep, VARIABLE_CONFIGS, type SensitivityVariable } from "@/engine";
 import {
   C_TEXT,
   C_DIM,
-  C_PRIMARY,
-  C_SECONDARY,
-  C_SUCCESS,
-  C_WARNING,
+  C_GRID,
+  C_DEVELOP,
+  C_PREVIEW,
+  C_CONSOLE_PURPLE,
   tooltipStyle,
 } from "./ProjectionChart";
 
@@ -66,20 +66,19 @@ export function SensitivityChart({ scenario }: Props) {
   );
 
   return (
-    <div className="brut-card p-4">
-      <div className="flex items-start justify-between gap-3 mb-4 flex-wrap pb-2 border-b-2 border-border">
+    <div className="v-card-featured p-5">
+      <div className="flex items-start justify-between gap-3 mb-5 flex-wrap">
         <div>
-          <h3 className="text-xs font-black uppercase tracking-widest">
-            Sensitivity analysis
-          </h3>
-          <p className="text-[11px] text-text-dim mt-1">
+          <h3 className="t-mono-label text-text-muted">Sensitivity analysis</h3>
+          <p className="t-body mt-1 text-text-dim">
             Trượt 1 biến để xem ROI thay đổi. Các biến khác giữ nguyên.
           </p>
         </div>
         <select
           value={variable}
           onChange={(e) => setVariable(e.target.value as SensitivityVariable)}
-          className="brut-input !w-auto text-xs font-bold"
+          className="v-input"
+          style={{ width: "auto", minWidth: 200 }}
         >
           {VARIABLE_OPTIONS.map((v) => (
             <option key={v} value={v}>
@@ -89,7 +88,7 @@ export function SensitivityChart({ scenario }: Props) {
         </select>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-3 gap-3 mb-5">
         <Stat
           label="Vị trí hiện tại"
           value={
@@ -97,12 +96,10 @@ export function SensitivityChart({ scenario }: Props) {
               ? `${currentDisplay}%`
               : `${currentDisplay} năm`
           }
-          tone="primary"
         />
         <Stat
           label="ROI tại điểm này"
           value={`${closestPoint["ROI / tổng vốn thực"]}%`}
-          tone="default"
         />
         <Stat
           label="Breakeven"
@@ -113,19 +110,20 @@ export function SensitivityChart({ scenario }: Props) {
                 : `${Math.round(breakevenDisplay)} năm`
               : "—"
           }
-          tone={breakevenDisplay !== null ? "warning" : "default"}
         />
       </div>
 
       <div style={{ width: "100%", height: 280 }}>
         <ResponsiveContainer>
-          <LineChart data={data} margin={{ top: 10, right: 16, left: -8, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="0" stroke={C_DIM} opacity={0.2} />
+          <LineChart data={data} margin={{ top: 16, right: 16, left: -12, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="0" stroke={C_GRID} />
             <XAxis
               dataKey="x"
-              stroke={C_TEXT}
+              stroke={C_DIM}
               fontSize={11}
-              fontWeight={600}
+              fontWeight={500}
+              tickLine={false}
+              axisLine={{ stroke: C_GRID }}
               type="number"
               domain={["dataMin", "dataMax"]}
               tickFormatter={(v) =>
@@ -133,77 +131,80 @@ export function SensitivityChart({ scenario }: Props) {
               }
             />
             <YAxis
-              stroke={C_TEXT}
+              stroke={C_DIM}
               fontSize={11}
-              fontWeight={600}
+              fontWeight={500}
+              tickLine={false}
+              axisLine={{ stroke: C_GRID }}
               tickFormatter={(v) => `${v}%`}
             />
             <Tooltip
               contentStyle={tooltipStyle}
+              cursor={{ stroke: C_GRID }}
               formatter={(v: number) => `${v}%`}
               labelFormatter={(v) =>
                 `${cfg.label}: ${v}${cfg.unit === "percent" ? "%" : " năm"}`
               }
             />
-            <Legend wrapperStyle={{ fontSize: 12, fontWeight: 600 }} />
-            <ReferenceLine y={0} stroke={C_TEXT} strokeWidth={2} />
+            <Legend wrapperStyle={{ fontSize: 12, fontWeight: 500 }} />
+            <ReferenceLine y={0} stroke={C_TEXT} strokeWidth={1} />
             <ReferenceLine
               x={currentDisplay}
-              stroke={C_SECONDARY}
-              strokeWidth={2}
-              strokeDasharray="6 4"
+              stroke={C_TEXT}
+              strokeWidth={1}
+              strokeDasharray="3 3"
               label={{
-                value: "HIỆN TẠI",
+                value: "CURRENT",
                 position: "top",
-                fill: C_SECONDARY,
+                fill: C_TEXT,
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 600,
               }}
             />
             {breakevenDisplay !== null && (
               <ReferenceLine
                 x={breakevenDisplay}
-                stroke={C_WARNING}
-                strokeWidth={2}
-                strokeDasharray="2 4"
+                stroke={C_CONSOLE_PURPLE}
+                strokeWidth={1}
+                strokeDasharray="3 3"
                 label={{
                   value: "BREAKEVEN",
                   position: "top",
-                  fill: C_WARNING,
+                  fill: C_CONSOLE_PURPLE,
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 600,
                 }}
               />
             )}
             <Line
               type="monotone"
               dataKey="ROI / vốn gốc"
-              stroke={C_SUCCESS}
-              strokeWidth={3}
+              stroke={C_PREVIEW}
+              strokeWidth={2}
               dot={false}
             />
             <Line
               type="monotone"
               dataKey="ROI / tổng vốn thực"
-              stroke={C_SECONDARY}
-              strokeWidth={3}
+              stroke={C_DEVELOP}
+              strokeWidth={2}
               dot={false}
             />
             <ReferenceDot
               x={closestPoint.x}
               y={closestPoint["ROI / tổng vốn thực"]}
-              r={6}
-              fill={C_PRIMARY}
-              stroke={C_TEXT}
+              r={4}
+              fill={C_DEVELOP}
+              stroke="#ffffff"
               strokeWidth={2}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <p className="text-[11px] text-text-dim mt-3 leading-relaxed">
-        Đường xanh dương = ROI trên tổng vốn thực (đã cộng tiền bù dòng tiền âm).
-        Đường xanh lá = ROI trên vốn gốc ban đầu.
+      <p className="t-caption text-text-muted mt-4 leading-relaxed">
+        ROI / tổng vốn thực đã cộng tiền bù dòng tiền âm. ROI / vốn gốc chỉ tính
+        khoản đầu tư ban đầu.
         {breakevenDisplay !== null && (
           <>
             {" "}
@@ -216,29 +217,21 @@ export function SensitivityChart({ scenario }: Props) {
   );
 }
 
-type StatTone = "primary" | "warning" | "default";
-
-const STAT_TONE: Record<StatTone, string> = {
-  primary: "bg-primary",
-  warning: "bg-warning text-card",
-  default: "bg-card",
-};
-
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: StatTone;
-}) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className={`border-2 border-border px-3 py-2 ${STAT_TONE[tone]}`}>
-      <div className="text-[10px] font-black uppercase tracking-widest opacity-80">
-        {label}
+    <div className="rounded-md shadow-border bg-card px-4 py-3">
+      <div className="t-mono-label text-text-muted">{label}</div>
+      <div
+        className="mt-1 font-semibold text-text"
+        style={{
+          fontSize: 20,
+          letterSpacing: "-0.4px",
+          fontVariantNumeric: "tabular-nums",
+          fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
+        }}
+      >
+        {value}
       </div>
-      <div className="text-base font-black mt-0.5 font-mono">{value}</div>
     </div>
   );
 }

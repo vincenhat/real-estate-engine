@@ -3,15 +3,13 @@
 import { useState, useEffect, useId, useRef } from "react";
 
 /**
- * Input fields cho engine — Neobrutalism style.
+ * Input fields cho engine — Vercel minimalism style.
  *
- * MoneyField: input số thuần, không format (đã thử format thì gặp bug nhập liệu).
- * PercentField: lưu decimal 0..1, hiển thị %. Tránh bug 0.07*100 = 7.000...001.
- * IntField: số nguyên có clamp.
- *
- * Cả 3 dùng pattern lastEmittedRef để phân biệt:
- *  - Value đến từ chính ta (echo) → bỏ qua, không sync draft.
- *  - Value đến từ ngoài (preset, reset, hydration) → sync draft.
+ * Cùng pattern như trước:
+ *  - MoneyField: input số thuần, tách draft/value
+ *  - PercentField: lưu decimal 0..1, hiển thị %
+ *  - IntField: số nguyên có clamp
+ *  - lastEmittedRef phân biệt echo vs external update
  */
 
 function roundClean(value: number, step: number): number {
@@ -37,18 +35,16 @@ interface FieldShellProps {
 function FieldShell({ label, hint, suffix, children }: FieldShellProps) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-bold uppercase tracking-wider text-text">
-        {label}
-      </span>
+      <span className="t-mono-label text-text-dim">{label}</span>
       <div className="flex items-center gap-2">
         <div className="flex-1">{children}</div>
         {suffix && (
-          <span className="text-xs font-bold text-text-dim min-w-[36px]">
+          <span className="t-mono-label text-text-muted min-w-[36px]">
             {suffix}
           </span>
         )}
       </div>
-      {hint && <span className="text-[11px] text-text-dim">{hint}</span>}
+      {hint && <span className="t-caption text-text-muted">{hint}</span>}
     </label>
   );
 }
@@ -105,13 +101,13 @@ export function MoneyField({
         onBlur={() => {
           if (draft === "") setDraft("0");
         }}
-        className="brut-input"
+        className="v-input"
       />
     </FieldShell>
   );
 }
 
-/* ─── Percent (lưu trữ decimal 0..1, hiển thị %) ──────────────────── */
+/* ─── Percent ─────────────────────────────────────────────────────── */
 
 export function PercentField({
   label,
@@ -179,13 +175,13 @@ export function PercentField({
             onChange(next);
           }
         }}
-        className="brut-input"
+        className="v-input"
       />
     </FieldShell>
   );
 }
 
-/* ─── Số nguyên ───────────────────────────────────────────────────── */
+/* ─── Int ─────────────────────────────────────────────────────────── */
 
 export function IntField({
   label,
@@ -247,7 +243,7 @@ export function IntField({
             onChange(clamped);
           }
         }}
-        className="brut-input"
+        className="v-input"
       />
     </FieldShell>
   );

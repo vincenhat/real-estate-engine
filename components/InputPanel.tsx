@@ -12,11 +12,7 @@ interface Props {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="text-xs font-black uppercase tracking-widest mb-3 pb-2 border-b-2 border-border">
-      {children}
-    </h3>
-  );
+  return <h3 className="t-mono-label text-text-muted mb-3">{children}</h3>;
 }
 
 export function InputPanel({ input, onChange, onLoadPreset }: Props) {
@@ -26,7 +22,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
   ) => onChange({ ...input, [key]: value });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Presets */}
       <div>
         <SectionTitle>Kịch bản mẫu</SectionTitle>
@@ -35,7 +31,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
             <button
               key={key}
               onClick={() => onLoadPreset(key)}
-              className="brut-btn text-left text-xs leading-tight !py-2 !px-3"
+              className="v-btn !justify-start !text-left t-small leading-tight"
             >
               {PRESETS[key].label}
             </button>
@@ -52,9 +48,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
             onChange={(v) => update("property", { ...input.property, price: v })}
           />
           <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider">
-              Phân khúc
-            </span>
+            <span className="t-mono-label text-text-dim">Phân khúc</span>
             <select
               value={input.property.segment}
               onChange={(e) =>
@@ -63,7 +57,7 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
                   segment: e.target.value as Segment,
                 })
               }
-              className="brut-input"
+              className="v-input"
             >
               {(Object.keys(SEGMENT_BENCHMARKS) as Segment[]).map((seg) => (
                 <option key={seg} value={seg}>
