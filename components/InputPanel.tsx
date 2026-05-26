@@ -3,44 +3,12 @@
 import type { ScenarioInput, Segment } from "@/engine";
 import { SEGMENT_BENCHMARKS } from "@/engine";
 import { PRESETS, type PresetKey } from "@/engine/presets";
+import { MoneyField, PercentField, IntField } from "./NumericFields";
 
 interface Props {
   input: ScenarioInput;
   onChange: (next: ScenarioInput) => void;
   onLoadPreset: (key: PresetKey) => void;
-}
-
-function NumberField({
-  label,
-  value,
-  onChange,
-  step = 1,
-  suffix,
-  hint,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-  step?: number;
-  suffix?: string;
-  hint?: string;
-}) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-xs text-text-dim">{label}</span>
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          value={value}
-          step={step}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full rounded bg-surface-2 border border-border px-3 py-2 text-sm focus:outline-none focus:border-accent"
-        />
-        {suffix && <span className="text-xs text-text-dim">{suffix}</span>}
-      </div>
-      {hint && <span className="text-[11px] text-text-dim/70">{hint}</span>}
-    </label>
-  );
 }
 
 export function InputPanel({ input, onChange, onLoadPreset }: Props) {
@@ -73,14 +41,10 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
       <section>
         <h3 className="text-sm font-semibold mb-3 text-accent">Tài sản</h3>
         <div className="space-y-3">
-          <NumberField
+          <MoneyField
             label="Giá mua"
             value={input.property.price}
-            onChange={(v) =>
-              update("property", { ...input.property, price: v })
-            }
-            step={100_000_000}
-            suffix="VNĐ"
+            onChange={(v) => update("property", { ...input.property, price: v })}
           />
           <label className="flex flex-col gap-1">
             <span className="text-xs text-text-dim">Phân khúc</span>
@@ -108,29 +72,25 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
       <section>
         <h3 className="text-sm font-semibold mb-3 text-accent">Khoản vay</h3>
         <div className="space-y-3">
-          <NumberField
+          <PercentField
             label="Tỷ lệ vốn tự có"
-            value={input.loan.equityRatio * 100}
-            onChange={(v) =>
-              update("loan", { ...input.loan, equityRatio: v / 100 })
-            }
-            suffix="%"
+            value={input.loan.equityRatio}
+            onChange={(v) => update("loan", { ...input.loan, equityRatio: v })}
+            step={1}
             hint="Phần còn lại sẽ vay ngân hàng"
           />
-          <NumberField
+          <PercentField
             label="Lãi suất vay"
-            value={input.loan.interestRate * 100}
-            onChange={(v) =>
-              update("loan", { ...input.loan, interestRate: v / 100 })
-            }
+            value={input.loan.interestRate}
+            onChange={(v) => update("loan", { ...input.loan, interestRate: v })}
             step={0.1}
-            suffix="%/năm"
           />
-          <NumberField
+          <IntField
             label="Kỳ hạn"
             value={input.loan.termYears}
             onChange={(v) => update("loan", { ...input.loan, termYears: v })}
-            suffix="năm"
+            min={1}
+            max={40}
           />
         </div>
       </section>
@@ -139,34 +99,27 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
       <section>
         <h3 className="text-sm font-semibold mb-3 text-accent">Cho thuê</h3>
         <div className="space-y-3">
-          <NumberField
+          <MoneyField
             label="Tiền thuê hàng tháng"
             value={input.rental.monthlyRent}
-            onChange={(v) =>
-              update("rental", { ...input.rental, monthlyRent: v })
-            }
-            step={500_000}
-            suffix="VNĐ/tháng"
+            onChange={(v) => update("rental", { ...input.rental, monthlyRent: v })}
           />
-          <NumberField
+          <PercentField
             label="Chi phí vận hành"
-            value={input.rental.operatingExpenseRatio * 100}
+            value={input.rental.operatingExpenseRatio}
             onChange={(v) =>
-              update("rental", {
-                ...input.rental,
-                operatingExpenseRatio: v / 100,
-              })
+              update("rental", { ...input.rental, operatingExpenseRatio: v })
             }
-            suffix="% tiền thuê"
-            hint="Phí QL, sửa chữa, thuế"
+            step={1}
+            hint="% của tiền thuê. Phí QL, sửa chữa, thuế."
           />
-          <NumberField
+          <PercentField
             label="Tỷ lệ trống nhà"
-            value={input.rental.vacancyRate * 100}
+            value={input.rental.vacancyRate}
             onChange={(v) =>
-              update("rental", { ...input.rental, vacancyRate: v / 100 })
+              update("rental", { ...input.rental, vacancyRate: v })
             }
-            suffix="%"
+            step={1}
             hint="8% ≈ 1 tháng trống/năm"
           />
         </div>
@@ -174,50 +127,48 @@ export function InputPanel({ input, onChange, onLoadPreset }: Props) {
 
       {/* Thị trường */}
       <section>
-        <h3 className="text-sm font-semibold mb-3 text-accent">Giả định thị trường</h3>
+        <h3 className="text-sm font-semibold mb-3 text-accent">
+          Giả định thị trường
+        </h3>
         <div className="space-y-3">
-          <NumberField
+          <PercentField
             label="Tốc độ tăng giá tài sản"
-            value={input.market.appreciationRate * 100}
+            value={input.market.appreciationRate}
             onChange={(v) =>
-              update("market", { ...input.market, appreciationRate: v / 100 })
+              update("market", { ...input.market, appreciationRate: v })
             }
             step={0.5}
-            suffix="%/năm"
           />
-          <NumberField
+          <PercentField
             label="Tốc độ tăng tiền thuê"
-            value={input.market.rentGrowthRate * 100}
+            value={input.market.rentGrowthRate}
             onChange={(v) =>
-              update("market", { ...input.market, rentGrowthRate: v / 100 })
+              update("market", { ...input.market, rentGrowthRate: v })
             }
             step={0.5}
-            suffix="%/năm"
           />
-          <NumberField
+          <PercentField
             label="Lãi tiết kiệm tham chiếu"
-            value={input.market.savingsRate * 100}
+            value={input.market.savingsRate}
             onChange={(v) =>
-              update("market", { ...input.market, savingsRate: v / 100 })
+              update("market", { ...input.market, savingsRate: v })
             }
             step={0.1}
-            suffix="%/năm"
           />
-          <NumberField
-            label="Thu nhập hộ gia đình"
+          <MoneyField
+            label="Thu nhập hộ gia đình / năm"
             value={input.market.householdAnnualIncome}
             onChange={(v) =>
               update("market", { ...input.market, householdAnnualIncome: v })
             }
-            step={20_000_000}
-            suffix="VNĐ/năm"
             hint="Để tính tỷ lệ Giá/Thu nhập"
           />
-          <NumberField
+          <IntField
             label="Thời gian nắm giữ"
             value={input.holdingYears}
             onChange={(v) => update("holdingYears", v)}
-            suffix="năm"
+            min={1}
+            max={50}
           />
         </div>
       </section>

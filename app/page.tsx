@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { simulate, type ScenarioInput } from "@/engine";
+import { useMemo } from "react";
+import { simulate } from "@/engine";
 import { PRESETS, type PresetKey } from "@/engine/presets";
 import { InputPanel } from "@/components/InputPanel";
 import { KpiCards } from "@/components/KpiCards";
@@ -9,21 +9,38 @@ import { ProjectionChart, CashFlowChart } from "@/components/ProjectionChart";
 import { YearlyTable } from "@/components/YearlyTable";
 import { RiskPanel } from "@/components/RiskPanel";
 import { SensitivityChart } from "@/components/SensitivityChart";
+import {
+  usePersistedScenario,
+  clearPersistedScenario,
+} from "@/hooks/usePersistedScenario";
 
 export default function Home() {
-  const [input, setInput] = useState<ScenarioInput>(PRESETS.synergy3B.input);
+  const [input, setInput] = usePersistedScenario(PRESETS.synergy3B.input);
 
   const result = useMemo(() => simulate(input), [input]);
 
   const loadPreset = (key: PresetKey) => setInput(PRESETS[key].input);
+  const reset = () => {
+    clearPersistedScenario();
+    setInput(PRESETS.synergy3B.input);
+  };
 
   return (
     <main className="min-h-screen">
-      <header className="border-b border-border px-6 py-4">
-        <h1 className="text-xl font-semibold">Real Estate Engine</h1>
-        <p className="text-sm text-text-dim">
-          Mô phỏng đòn bẩy, dòng tiền & rủi ro cho đầu tư BĐS Việt Nam
-        </p>
+      <header className="border-b border-border px-6 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Real Estate Engine</h1>
+          <p className="text-sm text-text-dim">
+            Mô phỏng đòn bẩy, dòng tiền & rủi ro cho đầu tư BĐS Việt Nam
+          </p>
+        </div>
+        <button
+          onClick={reset}
+          className="text-xs px-3 py-1.5 rounded border border-border bg-surface-2 hover:border-accent transition-colors"
+          title="Xóa dữ liệu đã lưu và quay về kịch bản mặc định"
+        >
+          Reset
+        </button>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 p-6">

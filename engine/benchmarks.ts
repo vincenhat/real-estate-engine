@@ -44,6 +44,17 @@ export const SEGMENT_BENCHMARKS: Record<Segment, SegmentBenchmark> = {
     netLow: 0.06,
     netHigh: 0.075,
   },
+  boardingHouse: {
+    // Dãy nhà trọ thường ở vùng ven KCN, gần trường học, khu công nhân.
+    // Yield cao hơn căn hộ do giá đất thấp + nhiều phòng/m2,
+    // bù lại có vacancy & opex (điện nước, sửa chữa) cao hơn.
+    // Tham chiếu: khảo sát thị trường thuê trọ TP.HCM, Bình Dương, Đồng Nai.
+    label: "Dãy nhà trọ",
+    grossLow: 0.08,
+    grossHigh: 0.12,
+    netLow: 0.06,
+    netHigh: 0.09,
+  },
 };
 
 /** Yield trung bình toàn thị trường VN quý 3/2025 (Batdongsan.com.vn). */

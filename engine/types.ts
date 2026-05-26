@@ -9,7 +9,8 @@ export type Segment =
   | "midCondo"        // Căn hộ trung cấp
   | "luxuryCondo"     // Căn hộ cao cấp / hạng sang
   | "shophouse"       // Nhà phố thương mại / văn phòng
-  | "industrial";     // Bất động sản công nghiệp
+  | "industrial"      // Bất động sản công nghiệp
+  | "boardingHouse";  // Dãy nhà trọ
 
 export interface PropertyInput {
   /** Giá mua tài sản (VNĐ) */
