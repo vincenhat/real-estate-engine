@@ -12,6 +12,7 @@ Engine triển khai 4 cụm tính toán tách biệt trong `engine/`:
 | Capital gain + đòn bẩy | `engine/simulator.ts` | Mô phỏng tăng giá tài sản, ROI trên equity vs trên tổng vốn thực |
 | Rental yield | `engine/simulator.ts` (`computeYields`) | Gross/net yield, so với benchmark phân khúc |
 | Risk & health | `engine/simulator.ts` (`assessRisk`) | DCR, spread tăng giá vs lãi, P/I, vacancy stress, cảnh báo |
+| Sensitivity | `engine/sensitivity.ts` | Sweep 1 biến (lãi vay, tăng giá, vacancy, equity, rent growth, holding) → curve ROI + breakeven |
 
 Benchmark thị trường (CBRE, Savills, Batdongsan, VARS, BIDV) trong `engine/benchmarks.ts`.
 

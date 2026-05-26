@@ -8,6 +8,7 @@ import { KpiCards } from "@/components/KpiCards";
 import { ProjectionChart, CashFlowChart } from "@/components/ProjectionChart";
 import { YearlyTable } from "@/components/YearlyTable";
 import { RiskPanel } from "@/components/RiskPanel";
+import { SensitivityChart } from "@/components/SensitivityChart";
 
 export default function Home() {
   const [input, setInput] = useState<ScenarioInput>(PRESETS.synergy3B.input);
@@ -41,6 +42,8 @@ export default function Home() {
             <ProjectionChart result={result} />
             <CashFlowChart result={result} />
           </div>
+
+          <SensitivityChart scenario={input} />
 
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
             <YearlyTable result={result} />
