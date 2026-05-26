@@ -66,14 +66,45 @@ export function MoneyField({
   step?: number;
 }) {
   const id = useId();
+  const [draft, setDraft] = useState(() => String(value));
+  const lastEmittedRef = useRef<number>(value);
+
+  useEffect(() => {
+    if (value !== lastEmittedRef.current) {
+      lastEmittedRef.current = value;
+      setDraft(String(value));
+    }
+  }, [value]);
+
   return (
     <FieldShell label={label} hint={hint} suffix="VNĐ">
       <input
         id={id}
         type="number"
         step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        value={draft}
+        onChange={(e) => {
+          const raw = e.target.value;
+          setDraft(raw);
+          if (raw === "") {
+            // Để input thực sự rỗng, không ép về 0 và đẩy lên cha
+            // (sẽ làm input hiển thị lại "0" và không xóa được).
+            if (lastEmittedRef.current !== 0) {
+              lastEmittedRef.current = 0;
+              onChange(0);
+            }
+            return;
+          }
+          const n = Number(raw);
+          if (Number.isFinite(n) && n !== lastEmittedRef.current) {
+            lastEmittedRef.current = n;
+            onChange(n);
+          }
+        }}
+        onBlur={() => {
+          // Khi rời input mà vẫn rỗng, hiển thị "0" cho gọn
+          if (draft === "") setDraft("0");
+        }}
         className={inputClass}
       />
     </FieldShell>
@@ -176,6 +207,16 @@ export function IntField({
   max?: number;
 }) {
   const id = useId();
+  const [draft, setDraft] = useState(() => String(value));
+  const lastEmittedRef = useRef<number>(value);
+
+  useEffect(() => {
+    if (value !== lastEmittedRef.current) {
+      lastEmittedRef.current = value;
+      setDraft(String(value));
+    }
+  }, [value]);
+
   return (
     <FieldShell label={label} hint={hint} suffix={suffix}>
       <input
@@ -183,11 +224,29 @@ export function IntField({
         type="number"
         min={min}
         max={max}
-        value={value}
+        value={draft}
         onChange={(e) => {
-          const n = Number(e.target.value);
-          if (Number.isFinite(n)) {
-            onChange(Math.max(min, Math.min(max, Math.round(n))));
+          const raw = e.target.value;
+          setDraft(raw);
+          if (raw === "") return; // cho phép tạm thời rỗng khi đang gõ
+          const n = Number(raw);
+          if (!Number.isFinite(n)) return;
+          const clamped = Math.max(min, Math.min(max, Math.round(n)));
+          if (clamped !== lastEmittedRef.current) {
+            lastEmittedRef.current = clamped;
+            onChange(clamped);
+          }
+        }}
+        onBlur={() => {
+          if (draft === "" || !Number.isFinite(Number(draft))) {
+            setDraft(String(value));
+            return;
+          }
+          const clamped = Math.max(min, Math.min(max, Math.round(Number(draft))));
+          setDraft(String(clamped));
+          if (clamped !== lastEmittedRef.current) {
+            lastEmittedRef.current = clamped;
+            onChange(clamped);
           }
         }}
         className={inputClass}
