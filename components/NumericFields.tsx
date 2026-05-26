@@ -28,13 +28,14 @@ import {
  *  - Cursor preservation: đếm số chữ số bên trái cursor → đặt lại sau format.
  */
 
-/** Format số nguyên với dấu chấm phân cách hàng nghìn (chuẩn VN). */
+/** Format số nguyên với dấu cách phân cách hàng nghìn (dễ nhìn, không gây
+ *  nhầm lẫn với dấu thập phân của các locale khác nhau). */
 function formatThousands(n: number): string {
   if (!Number.isFinite(n)) return "";
   const sign = n < 0 ? "-" : "";
   const digits = Math.abs(Math.trunc(n)).toString();
-  // Chèn "." mỗi 3 chữ số từ phải sang
-  const grouped = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  // Chèn " " mỗi 3 chữ số từ phải sang
+  const grouped = digits.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   return sign + grouped;
 }
 
