@@ -28,6 +28,16 @@ export const metadata: Metadata = {
     "Engine tính toán đòn bẩy, dòng tiền và rủi ro cho đầu tư bất động sản tại Việt Nam.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
+
 // Inline script chống FOUC: chạy đồng bộ trước khi React mount.
 // Đọc localStorage và set class "dark" lên <html> ngay từ đầu.
 const themeBootstrap = `

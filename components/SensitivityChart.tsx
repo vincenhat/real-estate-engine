@@ -66,19 +66,19 @@ export function SensitivityChart({ scenario }: { scenario: ScenarioInput }) {
   };
 
   return (
-    <div className="a-card p-5">
-      <div className="flex items-start justify-between gap-3 mb-5 flex-wrap">
-        <div>
+    <div className="a-card p-4 lg:p-5 min-w-0">
+      <div className="flex items-start justify-between gap-3 mb-4 lg:mb-5 flex-wrap">
+        <div className="flex-1 min-w-0">
           <h3 className="t-eyebrow text-text-muted">Sensitivity analysis</h3>
-          <p className="t-body text-text-dim mt-1">
+          <p className="t-control text-text-dim mt-1">
             Trượt 1 biến để xem ROI thay đổi. Các biến khác giữ nguyên.
           </p>
         </div>
         <select
           value={variable}
           onChange={(e) => setVariable(e.target.value as SensitivityVariable)}
-          className="a-input"
-          style={{ width: "auto", minWidth: 220 }}
+          className="a-input w-full sm:w-auto"
+          style={{ minWidth: 0 }}
         >
           {VARIABLE_OPTIONS.map((v) => (
             <option key={v} value={v}>
@@ -88,7 +88,7 @@ export function SensitivityChart({ scenario }: { scenario: ScenarioInput }) {
         </select>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-3 gap-2 lg:gap-3 mb-4 lg:mb-5">
         <Stat
           label="Vị trí hiện tại"
           value={
@@ -114,7 +114,7 @@ export function SensitivityChart({ scenario }: { scenario: ScenarioInput }) {
         />
       </div>
 
-      <div style={{ width: "100%", height: 280 }}>
+      <div className="w-full" style={{ height: "min(280px, 55vw)", minHeight: 220 }}>
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 16, right: 16, left: -12, bottom: 0 }}>
             <CartesianGrid strokeDasharray="0" stroke={t.grid} />
@@ -231,7 +231,7 @@ function Stat({
 }) {
   return (
     <div
-      className="a-panel px-4 py-3"
+      className="a-panel px-3 lg:px-4 py-2.5 lg:py-3 min-w-0"
       style={
         accent
           ? {
@@ -241,11 +241,11 @@ function Stat({
           : undefined
       }
     >
-      <div className="t-eyebrow text-text-muted">{label}</div>
+      <div className="t-eyebrow text-text-muted truncate">{label}</div>
       <div
-        className="mt-1"
+        className="mt-1 truncate"
         style={{
-          fontSize: 20,
+          fontSize: "clamp(15px, 4vw, 20px)",
           fontWeight: 600,
           letterSpacing: "-0.4px",
           color: accent ? "var(--accent)" : "var(--text)",

@@ -21,8 +21,8 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="a-card p-5">
-      <h3 className="t-eyebrow text-text-muted mb-4">{title}</h3>
+    <div className="a-card p-4 lg:p-5 min-w-0">
+      <h3 className="t-eyebrow text-text-muted mb-3 lg:mb-4">{title}</h3>
       {children}
     </div>
   );
@@ -50,7 +50,7 @@ export function ProjectionChart({ result }: { result: ScenarioResult }) {
 
   return (
     <ChartCard title="Tài sản & dư nợ — triệu VNĐ">
-      <div style={{ width: "100%", height: 280 }}>
+      <div className="w-full" style={{ height: "min(280px, 50vw)", minHeight: 200 }}>
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <CartesianGrid strokeDasharray="0" stroke={t.grid} />
@@ -121,7 +121,7 @@ export function CashFlowChart({ result }: { result: ScenarioResult }) {
 
   return (
     <ChartCard title="Dòng tiền hàng năm — triệu VNĐ">
-      <div style={{ width: "100%", height: 240 }}>
+      <div className="w-full" style={{ height: "min(240px, 45vw)", minHeight: 180 }}>
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <CartesianGrid strokeDasharray="0" stroke={t.grid} />

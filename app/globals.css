@@ -114,10 +114,20 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Tránh iOS auto-zoom khi focus input < 16px */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Inputs phải >=16px để iOS Safari không zoom khi focus */
+@media (max-width: 768px) {
+  .a-input {
+    font-size: 16px;
+  }
 }
 
 /* ── Typography helpers (Apple display scale) ─────────────────────── */

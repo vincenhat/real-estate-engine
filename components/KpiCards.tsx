@@ -15,7 +15,7 @@ export function KpiCards({ result }: { result: ScenarioResult }) {
     {
       label: "Tài sản ròng",
       value: formatVND(exit.netAssetAtExit),
-      sub: `Lợi nhuận ròng ${formatVND(exit.netProfit)}`,
+      sub: `Lãi ròng ${formatVND(exit.netProfit)}`,
     },
     {
       label: "ROI / Vốn gốc",
@@ -26,26 +26,26 @@ export function KpiCards({ result }: { result: ScenarioResult }) {
     {
       label: "ROI / Tổng vốn thực",
       value: formatPercent(exit.roiOnTotalCapital, 0),
-      sub: `Đã cộng ${formatVND(exit.totalCashInjection)} bù dòng tiền`,
+      sub: `Bù dòng tiền ${formatVND(exit.totalCashInjection)}`,
     },
     {
       label: "CAGR",
       value: formatPercent(exit.cagrOnTotalCapital, 1),
-      sub: "Tăng trưởng kép trên vốn thực",
+      sub: "Tăng trưởng kép",
     },
     {
       label: "Net yield",
       value: formatPercent(yields.netYield, 2),
-      sub: `Benchmark: ${formatPercent(yields.segmentBenchmark.netLow)} – ${formatPercent(yields.segmentBenchmark.netHigh)}`,
+      sub: `Chuẩn ${formatPercent(yields.segmentBenchmark.netLow)}–${formatPercent(yields.segmentBenchmark.netHigh)}`,
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
       {cards.map((c) => (
         <div
           key={c.label}
-          className="a-card p-5"
+          className="a-card p-4 lg:p-5 min-w-0"
           style={
             c.featured
               ? {
@@ -57,11 +57,11 @@ export function KpiCards({ result }: { result: ScenarioResult }) {
               : undefined
           }
         >
-          <div className="t-eyebrow text-text-muted">{c.label}</div>
+          <div className="t-eyebrow text-text-muted truncate">{c.label}</div>
           <div
-            className="mt-3"
+            className="mt-2 lg:mt-3 truncate"
             style={{
-              fontSize: 32,
+              fontSize: "clamp(20px, 5vw, 32px)",
               fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.5px",
@@ -71,7 +71,7 @@ export function KpiCards({ result }: { result: ScenarioResult }) {
           >
             {c.value}
           </div>
-          <div className="t-meta text-text-dim mt-2">{c.sub}</div>
+          <div className="t-meta text-text-dim mt-1 lg:mt-2 truncate">{c.sub}</div>
         </div>
       ))}
     </div>
